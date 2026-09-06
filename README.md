@@ -1,4 +1,4 @@
-# 🔥 Autoclave Cure Cycle Deviation Analyzer
+#  Autoclave Cure Cycle Deviation Analyzer
 
 A tool that reads autoclave cure run logs, checks them against a cure
 specification, flags every deviation, and writes an engineering summary — with a
