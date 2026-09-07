@@ -1,4 +1,4 @@
-#  Autoclave Cure Cycle Deviation Analyzer
+# 🔥 Autoclave Cure Cycle Deviation Analyzer
 
 A tool that reads autoclave cure run logs, checks them against a cure
 specification, flags every deviation, and writes an engineering summary — with a
@@ -9,10 +9,11 @@ Not a chatbot demo and not a wrapper around an API — a rule-based detection
 engine with a language model layered on top for the part language models are
 actually good at, and a check on that model because it can be wrong.
 
-> ⚠️ **Status: in development.** Started 3 September 2026. This README describes
-> what is being built. Completed stages are ticked and evidenced with
-> screenshots; everything else is marked planned. Nothing is claimed here that
-> isn't working yet.
+> ⚠️ **Status: in development.** Started 3 September 2026. Completed stages are
+> ticked below and evidenced with screenshots; everything else is marked planned.
+> Nothing is claimed here that isn't working yet.
+
+**Decisions and reasoning are recorded in [BUILD_LOG.md](BUILD_LOG.md).**
 
 ---
 
@@ -84,17 +85,46 @@ Run log (CSV)
 ```
 
 The specification lives in a JSON file rather than in the code, because
-different parts cure to different specs. The tool takes the spec as input.
+different parts cure to different specs. The spec is input, not logic.
+
+---
+
+## ✅ What works today
+
+The generator produces a complete 253-minute cure run written to CSV:
+
+| Stage | Behaviour |
+|---|---|
+| Ramp | 70°F → 350°F at 3°F/min, snapping to the setpoint rather than overshooting |
+| Soak | Held at 350°F for 120 minutes |
+| Cool-down | 5°F/min to 150°F |
+| Pressure | 85 psi through ramp and soak, then venting at 4 psi/min, clamped at zero |
+| Vacuum | 25 inHg held throughout |
+
+```
+minute,temp_f,pressure_psi,vacuum_inhg
+91,343.0,85.0,25.0
+92,346.0,85.0,25.0
+93,350.0,85.0,25.0
+...
+213,350.0,85.0,25.0
+214,345.0,81.0,25.0
+215,340.0,77.0,25.0
+```
+
+Two decisions in there are worth reading about in the build log: **why the ramp
+snaps to the setpoint** instead of stepping past it, and **why pressure vents
+gradually** rather than dropping instantly.
 
 ---
 
 ## 📋 Build stages
 
-- [ ] **[1] Run generator** — synthetic multi-hour logs with temperature,
-      pressure, vacuum and multiple thermocouples, plus deliberate fault
-      injection (slow ramp, fast ramp, cold soak, short dwell, vacuum loss,
-      pressure sag, sensor dropout) and a ground-truth record of what went into
-      which run.
+- [ ] **[1] Run generator** — *in progress.* Temperature, pressure and vacuum
+      done. Still to add: multiple thermocouples with lag and sensor noise, then
+      deliberate fault injection (slow ramp, fast ramp, cold soak, short dwell,
+      vacuum loss, pressure sag, sensor dropout) with a ground-truth record of
+      what went into which run.
 - [ ] **[2] Spec format and loader** — JSON spec with validation that rejects a
       malformed spec loudly instead of producing wrong results quietly.
 - [ ] **[3] Stage detection** — segment the actual run from the data, which gets
@@ -117,12 +147,12 @@ A summary that invents a deviation is worse than no summary. It sends someone
 looking for a problem that isn't there, and once that happens nobody trusts the
 tool again.
 
-This is the same lesson as the tie-out check in my
-[AR aging analyzer](https://github.com/y-chaitanya/ar-aging-risk-analyzer).
-There, a fixed-range formula understated reported exposure by $30,750 once the
-dataset grew, and nothing on screen looked wrong. The fix wasn't to be more
-careful with the formula — it was to make the sheet check its own arithmetic so
-that class of error surfaces immediately.
+This is the same lesson as the tie-out check in my [AR aging
+analyzer](https://github.com/y-chaitanya/ar-aging-risk-analyzer). There, a
+fixed-range formula understated reported exposure by $30,750 once the dataset
+grew, and nothing on screen looked wrong. The fix wasn't to be more careful with
+the formula — it was to make the sheet check its own arithmetic so that class of
+error surfaces immediately.
 
 Same idea here, applied to model output. The model is useful. It isn't
 authoritative. Something has to check it.
@@ -139,10 +169,23 @@ authoritative. Something has to check it.
   engineering.
 - **Nothing here has been validated against real equipment or a real quality
   process.** It demonstrates the approach, not a qualified system.
-- **The thresholds and severity levels are my own judgment**, written down so
-  they can be argued with.
+- **The thresholds and severity levels are my own judgment**, written down in the
+  build log so they can be argued with.
 - **Python is new to me.** I've written SQL, VBA and T-SQL before this. I'm
-  learning Python by building this, and I'll note the places where that showed.
+  learning Python by building this, and I note the places where that showed.
+
+---
+
+## ▶️ Running it
+
+```bash
+python3.12 -m venv venv
+source venv/bin/activate
+pip install pandas numpy matplotlib
+python src/generate_run.py
+```
+
+Writes `data/run_001.csv`.
 
 ---
 
@@ -159,4 +202,5 @@ including the parts that didn't work first time.
 
 Other projects:
 [Water Utility Operations Database](https://github.com/y-chaitanya/water-utility-operations-database) ·
-[AR Aging & Write-Off Risk Analyzer](https://github.com/y-chaitanya/ar-aging-risk-analyzer)
+[AR Aging & Write-Off Risk Analyzer](https://github.com/y-chaitanya/ar-aging-risk-analyzer) ·
+[CRM Member Retention Automation](https://github.com/y-chaitanya/crm-member-retention-automation)
