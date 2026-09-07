@@ -116,6 +116,45 @@ would have quietly poisoned any pressure rule written against it.
 
 `max()` enforces the floor in one line rather than an if-statement.
 
+## Three thermocouples with thermal lag
+
+Real parts have several probes and they don't agree. The controller reads one of
+them, but the edge of a part isn't the middle, and the difference between probes
+is itself a quality signal.
+
+I modelled three: one following the air closely with sensor noise, and two with
+thermal lag at 85% and 70% response.
+
+```python
+tc2 = tc2 + (temperature - tc2) * TC2_LAG
+```
+
+Read as: take the gap between the air and where the probe currently is, close
+85% of it. The probe is always heading toward the air temperature and never
+quite catching up.
+
+**The part I like about this formula is that cool-down needs no special case.**
+On the way up the gap is positive, so the probe climbs behind the air. On the
+way down the gap is negative, so the probe falls — but stays *above* the air.
+
+It's a pie out of the oven. The crust cools fast; the filling holds its heat long
+after the outside feels safe to touch. Thermal mass works in both directions.
+
+At minute 240 the air is 215.0 and the probes read 219.5, 220.9, 222.1 — all
+above, with the slowest probe highest. I didn't write that behaviour. It fell out
+of the same line of code.
+
+**Why this matters for soak duration.** During the soak the air holds at 350 but
+the probes are still climbing — they don't converge until minute 97, four minutes
+after the air arrived. The part isn't cured when the *air* reaches temperature.
+It's cured when the *part* does. That's why soak time is specified as a minimum
+rather than a target.
+
+**One ordering detail.** At minute 214 the air has dropped to 345 but the probes
+still read 350.0. There's a one-minute delay before the lag formula responds,
+because the loop records the current state before advancing it. Arguably correct
+— a probe genuinely hasn't responded in the first minute — but it's a boundary
+artefact worth knowing about before stage detection runs over it.
 ---
 
 ## Specification in JSON, not in code
