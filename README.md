@@ -91,40 +91,64 @@ different parts cure to different specs. The spec is input, not logic.
 
 ## ✅ What works today
 
-The generator produces a complete 253-minute cure run written to CSV:
+The generator produces a complete cure run written to CSV, and can inject
+deliberate faults.
 
-| Stage | Behaviour |
+| Component | Behaviour |
 |---|---|
 | Ramp | 70°F → 350°F at 3°F/min, snapping to the setpoint rather than overshooting |
 | Soak | Held at 350°F for 120 minutes |
 | Cool-down | 5°F/min to 150°F |
+| Thermocouples | Three probes — one following the air with sensor noise, two with thermal lag at 85% and 70% response |
 | Pressure | 85 psi through ramp and soak, then venting at 4 psi/min, clamped at zero |
 | Vacuum | 25 inHg held throughout |
-
+| Fault injection | Four parameter faults: slow ramp, fast ramp, short dwell, cold soak |
 ```
-minute,temp_f,pressure_psi,vacuum_inhg
-91,343.0,85.0,25.0
-92,346.0,85.0,25.0
-93,350.0,85.0,25.0
+minute,air_temp_f,tc1_f,tc2_f,tc3_f,pressure_psi,vacuum_inhg
+91,343.0,339.6,339.5,338.7,85.0,25.0
+92,346.0,342.7,342.5,341.7,85.0,25.0
+93,350.0,345.7,345.5,344.7,85.0,25.0
 ...
-213,350.0,85.0,25.0
-214,345.0,81.0,25.0
-215,340.0,77.0,25.0
+213,350.0,349.9,350.0,350.0,85.0,25.0
+214,345.0,350.5,350.0,350.0,81.0,25.0
+215,340.0,345.2,345.8,346.5,77.0,25.0
 ```
 
-Two decisions in there are worth reading about in the build log: **why the ramp
-snaps to the setpoint** instead of stepping past it, and **why pressure vents
-gradually** rather than dropping instantly.
+The probes lag behind the air on the way up and sit *above* it on the way down —
+thermal mass works in both directions, and the same formula handles both without
+a special case.
+
+### Faults
+
+Faults are injected at generation rather than patched into a finished file,
+because a slow ramp doesn't just change values — it changes how long the run
+*is*. At 1.5°F/min the ramp takes 186 minutes instead of 93, and every timestamp
+after it shifts.
+
+| Run | Ramp | Soak | Cool | Total |
+|---|---|---|---|---|
+| Nominal | 93 | 120 | 40 | 253 |
+| Slow ramp (1.5°F/min) | 186 | 120 | 40 | 346 |
+| Fast ramp (6°F/min) | 46 | 120 | 40 | 206 |
+| Short dwell (60 min) | 93 | 60 | 40 | 193 |
+| Cold soak (335°F) | 88 | 120 | 37 | 245 |
+
+Cold soak shortens both the ramp and the cool-down, because the run climbs less
+far and falls from lower.
+
+Two decisions worth reading about in the [build log](BUILD_LOG.md): **why the
+ramp snaps to the setpoint** instead of stepping past it, and **why pressure
+vents gradually** rather than dropping instantly.
 
 ---
 
 ## 📋 Build stages
 
-- [ ] **[1] Run generator** — *in progress.* Temperature, pressure and vacuum
-      done. Still to add: multiple thermocouples with lag and sensor noise, then
-      deliberate fault injection (slow ramp, fast ramp, cold soak, short dwell,
-      vacuum loss, pressure sag, sensor dropout) with a ground-truth record of
-      what went into which run.
+- [ ] **[1] Run generator** — *in progress.* Temperature, pressure, vacuum and
+      three thermocouples with thermal lag are done, along with four parameter
+      faults. Still to add: point-in-time faults (vacuum loss, pressure sag,
+      sensor dropout), multi-run generation, and a ground-truth record of which
+      fault went into which run.
 - [ ] **[2] Spec format and loader** — JSON spec with validation that rejects a
       malformed spec loudly instead of producing wrong results quietly.
 - [ ] **[3] Stage detection** — segment the actual run from the data, which gets
