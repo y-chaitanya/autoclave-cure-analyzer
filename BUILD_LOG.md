@@ -157,6 +157,37 @@ because the loop records the current state before advancing it. Arguably correct
 artefact worth knowing about before stage detection runs over it.
 ---
 
+## Fault injection: at generation, not after
+
+The generator needed to produce broken runs as well as good ones. Two ways to do
+that: modify a finished run afterwards, or build it wrong from the start.
+
+I take a fault name as a parameter and build it wrong from the start.
+
+**Why.** A slow ramp doesn't just change values — it changes how long the run
+*is*. At 1.5°F/min instead of 3, the ramp takes 186 minutes instead of 93, and
+every timestamp after it shifts. You can't patch that into a finished file
+without rebuilding the whole timeline.
+
+Some faults could be applied afterwards — a vacuum leak drops one column and
+leaves the rest untouched. But mixing two mechanisms means later wondering which
+category a given fault belongs to, and whether they interact. One mechanism is
+easier to reason about.
+
+**Choosing the fault values.** The temptation is to make faults obvious. A soak
+25°F below setpoint against a ±10°F tolerance would be caught by any detector on
+the first reading — which tests nothing.
+
+I set cold soak at 15°F low instead: 5 degrees outside tolerance, close enough
+that a noisy probe reading could sit near the boundary. The faults worth building
+are the ones that make the detector work.
+
+**A bug worth recording.** Converting the script into a function silently dropped
+the cool-down loop — it ended up after `return`, so it never ran. The program
+reported success and wrote 214 readings instead of 253. Nothing errored.
+
+That's the third time this class of failure has appeared in this project.
+
 ## Specification in JSON, not in code
 
 Different parts cure to different specs. If the thresholds live in the code, then
