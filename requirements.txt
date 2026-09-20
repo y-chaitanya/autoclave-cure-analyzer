@@ -1,0 +1,9 @@
+pytest>=7.0
+
+# The generator, detector, and verifier use the standard library only.
+# Optional, for the language model summary writer:
+# anthropic>=0.40
+
+# Planned for stage 8 (grounded Q&A) and stage 9 (interface):
+# chromadb>=0.5
+# streamlit>=1.30
