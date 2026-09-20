@@ -1,0 +1,33 @@
+{
+  "spec_id": "CS-350-2A",
+  "description": "350F epoxy prepreg cure, 2 hour hold at part temperature",
+  "revision": "illustrative — not any manufacturer's actual specification",
+  "ramp": {
+    "target_f_per_min": 3.0,
+    "min_f_per_min": 1.8,
+    "max_f_per_min": 5.0
+  },
+  "soak": {
+    "target_f": 350.0,
+    "tolerance_f": 10.0,
+    "min_duration_min": 120,
+    "governed_by": "slowest_probe"
+  },
+  "cooldown": {
+    "max_f_per_min": 6.0
+  },
+  "pressure": {
+    "min_psi": 80.0,
+    "max_psi": 100.0
+  },
+  "vacuum": {
+    "min_inhg": 22.0
+  },
+  "thermocouples": {
+    "channels": ["tc1_f", "tc2_f", "tc3_f"],
+    "max_spread_f": 15.0
+  },
+  "detection": {
+    "min_persistence_min": 3
+  }
+}

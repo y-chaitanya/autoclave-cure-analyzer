@@ -1,0 +1,118 @@
+{
+  "1001": {
+    "fault": "none",
+    "description": "Nominal run, no fault injected",
+    "seed": 8,
+    "noise_scale": 1.0,
+    "ramp_end_min": 93,
+    "soak_end_min": 213,
+    "total_minutes": 253,
+    "fault_window_min": null
+  },
+  "1002": {
+    "fault": "slow_ramp",
+    "description": "Heat-up at 1.5 F/min against a 3.0 F/min schedule",
+    "seed": 9,
+    "noise_scale": 1.0,
+    "ramp_end_min": 186,
+    "soak_end_min": 306,
+    "total_minutes": 346,
+    "fault_window_min": null
+  },
+  "1003": {
+    "fault": "fast_ramp",
+    "description": "Heat-up at 6.0 F/min, risking exotherm",
+    "seed": 10,
+    "noise_scale": 1.0,
+    "ramp_end_min": 46,
+    "soak_end_min": 166,
+    "total_minutes": 206,
+    "fault_window_min": null
+  },
+  "1004": {
+    "fault": "short_dwell",
+    "description": "Soak held 60 minutes against a 120 minute minimum",
+    "seed": 11,
+    "noise_scale": 1.0,
+    "ramp_end_min": 93,
+    "soak_end_min": 153,
+    "total_minutes": 193,
+    "fault_window_min": null
+  },
+  "1005": {
+    "fault": "cold_soak",
+    "description": "Soak held at 335 F, 15 F below setpoint",
+    "seed": 12,
+    "noise_scale": 1.0,
+    "ramp_end_min": 88,
+    "soak_end_min": 208,
+    "total_minutes": 245,
+    "fault_window_min": null
+  },
+  "1006": {
+    "fault": "vacuum_loss",
+    "description": "Bag vacuum decays mid-run from a developing leak",
+    "seed": 13,
+    "noise_scale": 1.0,
+    "ramp_end_min": 93,
+    "soak_end_min": 213,
+    "total_minutes": 253,
+    "fault_window_min": [
+      46,
+      213
+    ]
+  },
+  "1007": {
+    "fault": "pressure_sag",
+    "description": "Autoclave pressure sags during soak",
+    "seed": 14,
+    "noise_scale": 1.0,
+    "ramp_end_min": 93,
+    "soak_end_min": 213,
+    "total_minutes": 253,
+    "fault_window_min": [
+      113,
+      158
+    ]
+  },
+  "1008": {
+    "fault": "probe_lag",
+    "description": "One probe responds at 15 percent, indicating poor thermal contact",
+    "seed": 15,
+    "noise_scale": 1.0,
+    "ramp_end_min": 93,
+    "soak_end_min": 220,
+    "total_minutes": 260,
+    "fault_window_min": null
+  },
+  "1009": {
+    "fault": "none",
+    "description": "Nominal run, no fault injected",
+    "seed": 16,
+    "noise_scale": 1.0,
+    "ramp_end_min": 93,
+    "soak_end_min": 213,
+    "total_minutes": 253,
+    "fault_window_min": null
+  },
+  "1010": {
+    "fault": "none",
+    "description": "Nominal run, no fault injected",
+    "seed": 17,
+    "noise_scale": 1.0,
+    "ramp_end_min": 93,
+    "soak_end_min": 213,
+    "total_minutes": 253,
+    "fault_window_min": null
+  },
+  "1011": {
+    "fault": "none",
+    "description": "Nominal run, no fault injected",
+    "seed": 18,
+    "noise_scale": 1.0,
+    "ramp_end_min": 93,
+    "soak_end_min": 213,
+    "total_minutes": 253,
+    "fault_window_min": null
+  }
+}
